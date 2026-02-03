@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サービス申込書・利用規約作成ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide-static/0.321.0/lucide.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+
+        /* 印刷用設定 */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background-color: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .a4-page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                border: none !important;
+                width: 100% !important;
+                min-height: auto !important;
+                padding: 15mm !important;
+            }
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+
+        /* 画面表示用設定 */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm;
+            margin: 10px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            color: #1a1a1a;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .preview-container {
+            background-color: #e2e8f0;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .input-container {
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid #cbd5e1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 4px 8px;
+        }
+        .bg-gray-doc {
+            background-color: #f3f4f6;
+        }
+        
+        /* 利用規約用のスタイル */
+        .terms-content {
+            font-size: 10px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .terms-content h2 {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .terms-content p {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+<div class="flex flex-col md:flex-row">
+    <!-- 左側：入力フォーム -->
+    <div class="w-full md:w-2/5 input-container p-6 no-print bg-white">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                書類作成ツール
+            </h1>
+            <p class="text-sm text-slate-500">情報を入力すると右側の書類に反映されます。</p>
+        </div>
+
+        <div class="space-y-6">
+            <!-- 基本情報 -->
+            <div class="p-4 border border-slate-200 rounded-lg">
+                <h2 class="font-bold border-b mb-3 pb-1 text-blue-600">基本情報</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-slate-500">お申込日</label>
+                        <input type="date" id="input-app-date" class="w-full border p-2 rounded mt-1 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500">規約適用日 (附則)</label>
+                        <input type="date" id="input-terms-date" class="w-full border p-2 rounded mt-1 text-sm" value="2025-06-02">
+                    </div>
+                </div>
+            </div>
+
+            <!-- お客様情報 -->
+            <div class="p-4 border border-slate-200 rounded-lg">
+                <h2 class="font-bold border-b mb-3 pb-1 text-blue-600">お客様情報</h2>
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="input-company-kana" placeholder="会社名（フリガナ）" class="border p-2 rounded text-sm w-full">
+                        <input type="text" id="input-company-name" placeholder="会社名（屋号・個人名）" class="border p-2 rounded text-sm w-full">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="input-tel" placeholder="電話番号" class="border p-2 rounded text-sm w-full">
+                        <input type="text" id="input-zip" placeholder="郵便番号" class="border p-2 rounded text-sm w-full">
+                    </div>
+                    <input type="text" id="input-address" placeholder="住所" class="border p-2 rounded text-sm w-full">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="input-rep-name" placeholder="代表者名" class="border p-2 rounded text-sm w-full">
+                        <input type="text" id="input-staff-name" placeholder="担当者名" class="border p-2 rounded text-sm w-full">
+                    </div>
+                </div>
+            </div>
+
+            <!-- サービス内容 -->
+            <div class="p-4 border border-slate-200 rounded-lg">
+                <h2 class="font-bold border-b mb-3 pb-1 text-blue-600">サービス内容</h2>
+                <div class="space-y-3">
+                    <input type="text" id="input-svc-name" value="集客採用 まるっと支援" class="border p-2 rounded text-sm w-full">
+                    <textarea id="input-svc-detail" rows="4" class="border p-2 rounded text-sm w-full text-xs" placeholder="サービス詳細">・ホームページ最適化
+・ポータルサイト最適化
+・indeedによる採用代行</textarea>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="input-svc-price" value="150,000" class="border p-2 rounded text-sm w-full" placeholder="料金">
+                        <input type="date" id="input-svc-start" class="border p-2 rounded text-sm w-full">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02]">
+                印刷・PDFとして保存
+            </button>
+        </div>
+        
+        <div class="mt-10 text-[10px] text-slate-400">
+            ※「送信先」を「PDFに保存」にすることで、申込書と規約がセットになったPDFを作成できます。
+        </div>
+    </div>
+
+    <!-- 右側：プレビュー -->
+    <div class="w-full md:w-3/5 preview-container p-4">
+        
+        <!-- ページ1：申込書 -->
+        <div class="a4-page shadow-xl" id="doc-page-1">
+            <div class="flex justify-between items-start mb-6">
+                <h1 class="text-xl font-bold border-b-2 border-black pb-1">unfinished合同会社 サービスお申込書</h1>
+                <div class="text-right">
+                    <span>(お申込日)</span>
+                    <span id="view-app-date" class="inline-block min-w-[120px] border-b border-black text-center font-bold">2025年　月　日</span>
+                </div>
+            </div>
+
+            <!-- お客様情報テーブル -->
+            <div class="flex border-t border-l border-black mb-4">
+                <div class="w-[40px] border-r border-b border-black bg-gray-doc flex items-center justify-center font-bold text-center leading-tight">客情<br>様報</div>
+                <div class="flex-1">
+                    <div class="flex">
+                        <div class="w-1/4 border-r border-b border-black bg-gray-doc p-1 text-[9px] flex items-center">会社名<br>(屋号・個人名)</div>
+                        <div class="flex-1 border-r border-b border-black p-2">
+                            <div id="view-company-kana" class="text-[8px] min-h-[10px]"></div>
+                            <div id="view-company-name" class="font-bold text-lg"></div>
+                        </div>
+                        <div class="w-[60px] border-r border-b border-black bg-gray-doc p-1 text-[9px] flex items-center text-center">電話番号</div>
+                        <div id="view-tel" class="w-1/4 border-r border-b border-black p-2 font-bold flex items-center"></div>
+                    </div>
+                    <div class="flex">
+                        <div class="w-[40px] border-r border-b border-black bg-gray-doc p-1 flex items-center justify-center italic">〒</div>
+                        <div class="flex-1 border-r border-b border-black p-2">
+                            <span id="view-zip" class="font-bold mr-4"></span>
+                            <span id="view-address"></span>
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <div class="w-1/4 border-r border-b border-black bg-gray-doc p-1 text-[9px] flex items-center">代表者名</div>
+                        <div id="view-rep-name" class="flex-1 border-r border-b border-black p-2 font-bold text-base"></div>
+                        <div class="w-1/4 border-r border-b border-black bg-gray-doc p-1 text-[9px] flex items-center">担当者名</div>
+                        <div id="view-staff-name" class="flex-1 border-r border-b border-black p-2 text-base"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 申込内容テーブル -->
+            <div class="mb-4">
+                <div class="bg-gray-doc font-bold px-2 py-0.5 border border-black text-xs">お申込内容</div>
+                <table>
+                    <thead>
+                        <tr class="bg-gray-doc text-[9px]">
+                            <th class="w-[25%]">サービス名</th>
+                            <th class="w-[40%]">サービス詳細</th>
+                            <th class="w-[10%]">契約期間</th>
+                            <th class="w-[15%]">料金(税抜)</th>
+                            <th class="w-[10%]">単位</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-[10px]">
+                        <tr class="h-32 align-top">
+                            <td id="view-svc-name" class="font-bold p-2"></td>
+                            <td id="view-svc-detail" class="whitespace-pre-wrap p-2"></td>
+                            <td class="text-center p-2">3ヶ月</td>
+                            <td id="view-svc-price" class="text-right font-bold p-2"></td>
+                            <td class="text-center p-2">月</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="border border-black p-2 flex items-center gap-4 mb-8">
+                <div class="bg-gray-doc font-bold p-1 border border-black px-4 text-xs">サービス利用開始年月日</div>
+                <div id="view-svc-start" class="border-b border-black flex-1 text-center font-bold text-lg">2025年　月　日</div>
+            </div>
+
+            <div class="text-[9px] space-y-1 mb-8">
+                <h3 class="font-bold underline">《お支払いについて》</h3>
+                <p>・当月末締め翌月末支払いとなります。毎月15日までに請求書を送付いたします。</p>
+                <p>・振込手数料はお客様にてご負担ください。</p>
+                <p>・解約の申し出がない限り、3ヶ月ごとの自動更新となります。</p>
+            </div>
+
+            <div class="mt-auto pt-4 border-t border-slate-300 flex justify-between text-[9px] text-slate-600">
+                <div>
+                    <div class="font-bold">&lt;提供会社&gt; unfinished合同会社</div>
+                    <div>〒116-0014 東京都荒川区東日暮里3-2-4 Tel:070-3663-2459</div>
+                </div>
+                <div class="text-right self-end">Ver. 20251015</div>
+            </div>
+        </div>
+
+        <!-- ページ2：利用規約 -->
+        <div class="a4-page shadow-xl page-break" id="doc-page-2">
+            <div class="terms-content">
+                <h1 class="text-center text-lg font-bold mb-4">indeed採用代行サービス 利用規約</h1>
+                <p>この利用規約(以下「本規約」といいます。)は、unfinished合同会社(以下「当社」といいます。)が提供する「indeed採用代行サービス」(以下「本サービス」といいます。)の利用に関する条件を定めるものです。本サービスの利用を希望されるお客様(以下「利用者」といいます。)は、本規約に同意の上、本サービスをご利用ください。</p>
+
+                <h2>第1条(本サービスの概要)</h2>
+                <p>本サービスは、利用者の採用活動において、Indeedプラットフォームにおける求人情報の掲載、管理、応募者対応の一部代行など、採用業務に関する支援を提供するものです。本サービスでは、利用者の「応募数」の最大化を目標とし、運用状況に応じて、必要に応じて最適なご提案を再度行う場合があります。</p>
+
+                <h2>第2条(契約の成立および適用)</h2>
+                <p>1. 利用者は、本規約に同意の上、当社が定める方法により本サービスの利用を申し込み、当社がこれを承諾することにより、当社との間で本サービスの利用契約(以下「本契約」といいます。)が成立するものとします。<br>
+                2. 本規約は、本サービスの利用に関する当社と利用者との間のすべての関係に適用されるものとします。</p>
+
+                <h2>第3条(契約期間)</h2>
+                <p>本サービスの契約期間は、<strong>契約期間の縛りはございません。</strong>利用者は、次条に定める解約手続きを行うことにより、いつでも本契約を終了させることができます。</p>
+
+                <h2>第4条(利用料金および支払方法)</h2>
+                <p>1. 利用者は、本サービスの利用の対価として、当社が別途定める料金を支払うものとします。<br>
+                2. 利用料金の支払い条件は、当月末締め翌月末払いとします。利用者は、当社が発行する請求書に基づき、期日までに支払うものとします。<br>
+                3. 利用者が支払期日までに利用料金を支払わない場合、年14.6%の割合による遅延損害金を支払うものとします。</p>
+
+                <h2>第5条(禁止事項)</h2>
+                <p>利用者は、法令または公序良俗に違反する行為、当社または第三者の知的財産権等を侵害する行為、本サービスの運営を妨害する行為を行ってはならないものとします。</p>
+
+                <h2>第6条(免責事項)</h2>
+                <p>1. 当社は、本サービスが利用者の特定の目的に適合すること、正確性、有用性を有することについて、何ら保証するものではありません。<br>
+                2. Indeedプラットフォームの仕様変更、利用規約変更等により本サービスの一部が提供できなくなった場合においても、当社は一切の責任を負わないものとします。</p>
+
+                <h2>第7条(機密保持)</h2>
+                <p>当社および利用者は、本サービスの利用を通じて知り得た相手方の機密情報を、相手方の書面による事前の承諾なくして第三者に開示または漏洩してはならないものとします。</p>
+
+                <h2>第8条(規約の変更)</h2>
+                <p>当社は、必要と判断した場合、利用者に事前に通知することなく、いつでも本規約を変更することができるものとします。変更後、利用者が本サービスを利用した場合、変更後の規約に同意したものとみなします。</p>
+
+                <div class="mt-10 pt-4 border-t border-black">
+                    <p class="font-bold text-right">附則：本規約は<span id="view-terms-date" class="border-b border-black px-2">2025年6月2日</span>から適用されます。</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ユーティリティ: 日付フォーマット (YYYY-MM-DD -> YYYY年M月D日)
+    function formatDate(dateStr) {
+        if (!dateStr) return "2025年　月　日";
+        const date = new Date(dateStr);
+        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    }
+
+    // リアルタイム反映ロジック
+    function updatePreview() {
+        // 基本情報
+        document.getElementById('view-app-date').innerText = formatDate(document.getElementById('input-app-date').value);
+        document.getElementById('view-terms-date').innerText = formatDate(document.getElementById('input-terms-date').value);
+
+        // お客様情報
+        document.getElementById('view-company-kana').innerText = document.getElementById('input-company-kana').value;
+        document.getElementById('view-company-name').innerText = document.getElementById('input-company-name').value;
+        document.getElementById('view-tel').innerText = document.getElementById('input-tel').value;
+        document.getElementById('view-zip').innerText = document.getElementById('input-zip').value;
+        document.getElementById('view-address').innerText = document.getElementById('input-address').value;
+        document.getElementById('view-rep-name').innerText = document.getElementById('input-rep-name').value;
+        document.getElementById('view-staff-name').innerText = document.getElementById('input-staff-name').value;
+
+        // サービス
+        document.getElementById('view-svc-name').innerText = document.getElementById('input-svc-name').value;
+        document.getElementById('view-svc-detail').innerText = document.getElementById('input-svc-detail').value;
+        document.getElementById('view-svc-price').innerText = document.getElementById('input-svc-price').value;
+        document.getElementById('view-svc-start').innerText = formatDate(document.getElementById('input-svc-start').value);
+    }
+
+    // すべての入力項目にイベントリスナーを設定
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('input', updatePreview);
+    });
+
+    // 初期化実行
+    updatePreview();
+</script>
+
+</body>
+</html>
